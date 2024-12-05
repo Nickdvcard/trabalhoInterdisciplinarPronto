@@ -263,5 +263,27 @@ router.put('/id/:id', async (req, res) => {
     }
 });
 
+router.get('/nome/:id', (req, res) => {
+    const profissionalId = req.params.id;
+
+    const query = `
+        SELECT primeiroNome, ultimoNome
+        FROM bancoapae6.profissionais
+        WHERE idProfissionais = ?;
+    `;
+
+    pool.query(query, [profissionalId], (error, results) => {
+        if (error) {
+            console.error("Erro ao carregar o nome do profissional:", error);
+            return res.status(500).json({ error: 'Erro ao carregar nome do profissional' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Profissional não encontrado' });
+        }
+
+        res.json(results[0]); // Retorna o primeiro e último nome do profissional
+    });
+});
 
 module.exports = router;

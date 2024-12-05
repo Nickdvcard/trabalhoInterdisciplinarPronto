@@ -22,6 +22,7 @@ export default async function handleDeleteAgendamento(pid) {
         }
 
     alert('Agendamento deletado com sucesso!');
+
   } catch (error) {
     console.error('Erro ao deletar o agendamento:', error);
     alert('Erro ao deletar o agendamento');

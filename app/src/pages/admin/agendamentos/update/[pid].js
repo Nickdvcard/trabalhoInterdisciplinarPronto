@@ -204,6 +204,8 @@ export default function EditAgendamento() {
 
   return (
     <>
+            <NavAdmin />
+            <MenuUsers />
       <div className="d-flex justify-content-center p-4" style={{ backgroundColor: "#f7f7f7", minHeight: "100vh" }}>
         <div className="container">
           <div className="row mb-4 pb-3" style={{ borderBottom: "1px solid #a0a0a0" }}>
@@ -255,7 +257,6 @@ export default function EditAgendamento() {
                 className="form-control"
                 value={agendamento.dia ? agendamento.dia.split("T")[0] : ""}
                 onChange={handleChange}
-                min={todayDate}
                 required
               />
             </div>

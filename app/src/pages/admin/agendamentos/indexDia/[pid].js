@@ -7,18 +7,25 @@ import Link from 'next/link'
 import MenuUsers from '@/components/MenuUsers'
 import { useRouter } from 'next/router';
 
-export default function agendamentos() {
-
-  const API_URL = "http://localhost:8080/api/agendamentos/idProfissionais/antigo/"  // URL de agendamentos
+export default function Agendamentos() {
+  const API_URL = "http://localhost:8080/api/agendamentos/idProfissionais/dia"  // URL de agendamentos
   const router = useRouter();
   const { pid } = router.query;
 
   const [agendamentos, setAgendamentos] = useState([]); 
+  const [dataFiltro, setDataFiltro] = useState('');  // Estado para o filtro de data
+
+  // Ajustando para pegar o dia de hoje, se o filtro de data não for definido
+  const hoje = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     const getAllAgendamentos = async () => {
       try {
-        const response = await Axios.get(API_URL + pid);
+        // Se uma data foi selecionada, usa ela, caso contrário, usa a data de hoje
+        const dataSelecionada = dataFiltro || hoje;
+
+        const url = pid ? `${API_URL}/${pid}/${dataSelecionada}` : `${API_URL}/${pid}`;
+        const response = await Axios.get(url);
         setAgendamentos(response.data);
         console.log(response.data);
         
@@ -27,8 +34,10 @@ export default function agendamentos() {
       }
     };
 
-    getAllAgendamentos();
-  }, [pid]);  // Adicionando o pid como dependência para recarregar quando mudar
+    if (pid) {
+      getAllAgendamentos();
+    }
+  }, [pid, dataFiltro, hoje]);  // Adiciona `dataFiltro` e `hoje` como dependências
 
   return (
     <>
@@ -45,18 +54,29 @@ export default function agendamentos() {
       <div className="d-flex justify-content-center p-4" style={{ background: 'linear-gradient(45deg, #ffffff, #d4edda)', minHeight: '100vh' }}>
         <div className="container">
           <div className="row mb-4 pb-3" style={{ borderBottom: '1px solid #a0a0a0' }}>
-            <h3 className="text-success">Lista de Agendamentos</h3>
+            <h3 className="text-success">Lista de Agendamentos - Filtro por Data</h3>
           </div>
   
           <div className="d-flex justify-content-center mb-4">
             <Link className="nav-link" href={`/admin/agendamentos/index/${pid}`}>
-              <button className="btn btn-success btn-lg p-3">Visualizar Agendamentos a Serem Feitos</button>
+              <button className="btn btn-success btn-lg p-3">Visualizar Agenda </button>
             </Link>
+          </div>
+
+          {/* Input de data */}
+          <div className="d-flex justify-content-center mb-4">
+            <input 
+              type="date" 
+              className="form-control"
+              value={dataFiltro || hoje}  // Valor inicial é o dia de hoje
+              onChange={(e) => setDataFiltro(e.target.value)} 
+              style={{ maxWidth: '250px' }}
+            />
           </div>
   
           {agendamentos.length === 0 ? (
             <div className="text-center">
-              <p className="text-danger"><strong>Não há agendamentos antigos para este profissional.</strong></p>
+              <p className="text-danger"><strong>Não há agendamentos para este profissional para o dia selecionado.</strong></p>
             </div>
           ) : (
             <div className="row">
